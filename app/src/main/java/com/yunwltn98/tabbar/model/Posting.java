@@ -7,6 +7,7 @@ public class Posting {
     private String content;
     private String email;
     private String updatedAt;
+    private int likeCnt;
     private int isLike;
 
     public int getId() {
@@ -47,6 +48,14 @@ public class Posting {
 
     public void setUpdatedAt(String updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public int getLikeCnt() {
+        return likeCnt;
+    }
+
+    public void setLikeCnt(int likeCnt) {
+        this.likeCnt = likeCnt;
     }
 
     public int getIsLike() {

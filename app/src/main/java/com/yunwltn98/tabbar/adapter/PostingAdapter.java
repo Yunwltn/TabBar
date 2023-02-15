@@ -1,7 +1,6 @@
 package com.yunwltn98.tabbar.adapter;
 
 import android.content.Context;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,6 +31,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.ViewHold
     public interface OnItemClickListener {
         // 프레그먼트에서 사용가능토록 어댑터의 특정행이나 버튼 누르면 처리할 함수를 만든다
         void likeProcess(int index);
+        void onImageClick(int index);
     }
 
     public OnItemClickListener listener;
@@ -117,6 +117,14 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.ViewHold
 //                    ((FirstFragment)((MainActivity)context).firstFragment).likeProcess(index);
                     listener.likeProcess(index);
 
+                }
+            });
+
+            imgPhoto.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int index = getAdapterPosition();
+                    listener.onImageClick(index);
                 }
             });
         }

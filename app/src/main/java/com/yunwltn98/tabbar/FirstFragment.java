@@ -159,6 +159,15 @@ public class FirstFragment extends Fragment {
                         public void likeProcess(int index) {
                             FirstFragment.this.likeProcess(index);
                         }
+                        @Override
+                        public void onImageClick(int index) {
+                            Posting posting = postingList.get(index);
+                            String imgUrl = posting.getImgUrl();
+
+                            Intent intent = new Intent(getActivity(), PhotoActivity.class);
+                            intent.putExtra("imgUrl", imgUrl);
+                            startActivity(intent);
+                        }
                     });
                     recyclerView.setAdapter(adapter);
                 }
