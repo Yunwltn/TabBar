@@ -1,4 +1,4 @@
-package com.yunwltn98.tabbar.adapter.api;
+package com.yunwltn98.tabbar.api;
 
 import com.yunwltn98.tabbar.model.PostingList;
 import com.yunwltn98.tabbar.model.Res;

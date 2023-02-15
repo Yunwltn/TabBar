@@ -1,12 +1,35 @@
 package com.yunwltn98.tabbar;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ProgressBar;
+
+import com.yunwltn98.tabbar.adapter.PostingAdapter;
+import com.yunwltn98.tabbar.api.NetworkClient;
+import com.yunwltn98.tabbar.api.PostingApi;
+import com.yunwltn98.tabbar.config.Config;
+import com.yunwltn98.tabbar.model.Posting;
+import com.yunwltn98.tabbar.model.PostingList;
+import com.yunwltn98.tabbar.model.Res;
+
+import java.util.ArrayList;
+
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
+import retrofit2.Retrofit;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -55,10 +78,153 @@ public class FirstFragment extends Fragment {
         }
     }
 
+    Button btnAdd;
+    RecyclerView recyclerView;
+    PostingAdapter adapter;
+    ArrayList<Posting> postingList = new ArrayList<>();
+
+    ProgressBar progressBar;
+
+    // 페이징 처리를 위한 변수
+    int count = 0;
+    int offset = 0;
+    int limit = 7;
+    private Posting selectedPosting;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_first, container, false);
+        ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.fragment_first, container, false);
+
+        btnAdd = rootView.findViewById(R.id.btnAdd);
+        progressBar = rootView.findViewById(R.id.progressBar);
+
+        recyclerView = rootView.findViewById(R.id.recyclerView);
+        recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+        btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getActivity(), AddActivity.class);
+                startActivity(intent);
+            }
+        });
+
+        getNetworkData();
+
+        return rootView;
+    }
+    void getNetworkData() {
+        progressBar.setVisibility(View.VISIBLE);
+
+        Retrofit retrofit = NetworkClient.getRetrofitClient(getActivity());
+
+        PostingApi api = retrofit.create(PostingApi.class);
+
+        SharedPreferences sp = getActivity().getSharedPreferences(Config.PREFERENCE_NAME, Context.MODE_PRIVATE);
+        String accessToken = "Bearer " + sp.getString(Config.ACCESS_TOKEN, "");
+
+        offset = 0;
+
+        Call<PostingList> call = api.getPosting(accessToken, offset, limit);
+
+        call.enqueue(new Callback<PostingList>() {
+            @Override
+            public void onResponse(Call<PostingList> call, Response<PostingList> response) {
+                progressBar.setVisibility(View.GONE);
+
+                if(response.isSuccessful()){
+
+                    postingList.clear();
+
+                    count = response.body().getCount();
+                    postingList.addAll( response.body().getItems() );
+
+                    for (int i = 0; i < postingList.size(); i ++) {
+                        Log.i("TEST1", postingList.get(i).getId()+"");
+                        Log.i("TEST12", postingList.get(i).getEmail()+"");
+                        Log.i("TEST123", postingList.get(i).getImgUrl()+"");
+                        Log.i("TEST1234", postingList.get(i).getContent()+"");
+                        Log.i("TEST12346", postingList.get(i).getIsLike()+"");
+
+                    }
+
+                    offset = offset + count;
+
+                    adapter = new PostingAdapter(getActivity(), postingList);
+                    adapter.setOnItemClickListener(new PostingAdapter.OnItemClickListener() {
+                        @Override
+                        public void likeProcess(int index) {
+                            FirstFragment.this.likeProcess(index);
+                        }
+                    });
+                    recyclerView.setAdapter(adapter);
+                }
+            }
+            @Override
+            public void onFailure(Call<PostingList> call, Throwable t) {
+                progressBar.setVisibility(View.GONE);
+            }
+        });
+    }
+
+    public void likeProcess(int index) {
+        selectedPosting = postingList.get(index);
+
+        // 2. 해당 행의 좋아요가 이미 좋아요인지 아닌지 파악
+        if (selectedPosting.getIsLike() == 0) {
+            Retrofit retrofit = NetworkClient.getRetrofitClient(getActivity());
+            PostingApi api = retrofit.create(PostingApi.class);
+
+            SharedPreferences sp = getActivity().getSharedPreferences(Config.PREFERENCE_NAME, getActivity().MODE_PRIVATE);
+            String accessToken = "Bearer " + sp.getString(Config.ACCESS_TOKEN, "");
+
+            Call<Res> call = api.setLike(selectedPosting.getId(), accessToken);
+            call.enqueue(new Callback<Res>() {
+                @Override
+                public void onResponse(Call<Res> call, Response<Res> response) {
+                    if (response.isSuccessful()) {
+                        // 4. 화면에 결과를 표시
+                        selectedPosting.setIsLike(1);
+                        adapter.notifyDataSetChanged();
+                    } else {
+
+                    }
+                }
+                @Override
+                public void onFailure(Call<Res> call, Throwable t) {
+                }
+            });
+
+
+        } else {
+            // 좋아요 해제 API 호출
+            Retrofit retrofit = NetworkClient.getRetrofitClient(getActivity());
+            PostingApi api = retrofit.create(PostingApi.class);
+
+            SharedPreferences sp = getActivity().getSharedPreferences(Config.PREFERENCE_NAME, getActivity().MODE_PRIVATE);
+            String accessToken = "Bearer " + sp.getString(Config.ACCESS_TOKEN, "");
+
+            Call<Res> call = api.deleteLike(selectedPosting.getId(), accessToken);
+            call.enqueue(new Callback<Res>() {
+                @Override
+                public void onResponse(Call<Res> call, Response<Res> response) {
+                    if (response.isSuccessful()) {
+                        // 4. 화면에 결과를 표시
+                        selectedPosting.setIsLike(0);
+                        adapter.notifyDataSetChanged();
+                    } else {
+
+                    }
+                }
+
+                @Override
+                public void onFailure(Call<Res> call, Throwable t) {
+
+                }
+            });
+        }
     }
 }

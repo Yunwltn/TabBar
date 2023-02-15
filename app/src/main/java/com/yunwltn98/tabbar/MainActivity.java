@@ -7,24 +7,37 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.NavigationUI;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.MenuItem;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.navigation.NavigationBarView;
+import com.yunwltn98.tabbar.config.Config;
 
 public class MainActivity extends AppCompatActivity {
 
     BottomNavigationView navigationView;
     // 각 프레그먼트를 멤버 변수로 만든다
-    Fragment firstFragment;
-    Fragment secondFragment;
-    Fragment thirdFragment;
+    public Fragment firstFragment;
+    public Fragment secondFragment;
+    public Fragment thirdFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // 억세스 토큰이 있는지 확인
+        SharedPreferences sp = getSharedPreferences(Config.PREFERENCE_NAME, MODE_PRIVATE);
+        String accessToken = sp.getString(Config.ACCESS_TOKEN, "");
+        if(accessToken.isEmpty()){
+            Intent intent = new Intent(MainActivity.this, RegisterActivity.class);
+            startActivity(intent);
+            finish();
+            return;
+        }
 
         getSupportActionBar().setTitle("홈");
 

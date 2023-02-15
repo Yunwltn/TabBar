@@ -1,4 +1,4 @@
-package com.yunwltn98.tabbar.adapter.api;
+package com.yunwltn98.tabbar.api;
 
 import com.yunwltn98.tabbar.model.User;
 import com.yunwltn98.tabbar.model.UserRes;

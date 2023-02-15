@@ -1,6 +1,7 @@
 package com.yunwltn98.tabbar.adapter;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,7 +13,6 @@ import androidx.cardview.widget.CardView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.yunwltn98.tabbar.MainActivity;
 import com.yunwltn98.tabbar.R;
 import com.yunwltn98.tabbar.model.Posting;
 
@@ -29,8 +29,15 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.ViewHold
     SimpleDateFormat sf;
     SimpleDateFormat df;
 
-    Posting selectedPosting;
+    public interface OnItemClickListener {
+        // 프레그먼트에서 사용가능토록 어댑터의 특정행이나 버튼 누르면 처리할 함수를 만든다
+        void likeProcess(int index);
+    }
 
+    public OnItemClickListener listener;
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.listener = listener;
+    };
 
     public PostingAdapter(Context context, ArrayList<Posting> postingList) {
         this.context = context;
@@ -59,7 +66,7 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.ViewHold
         holder.txtEmail.setText(posting.getEmail());
 
         try {
-            Date date = sf.parse(posting.getCreatedAt());
+            Date date = sf.parse(posting.getUpdatedAt());
             holder.txtCreatedAt.setText(df.format(date));
         } catch (ParseException e) {
 
@@ -107,10 +114,11 @@ public class PostingAdapter extends RecyclerView.Adapter<PostingAdapter.ViewHold
                 public void onClick(View view) {
                     // 1. 어느번째의 데이터의 좋아요를 누른 것인지 확인해서 함수 호출
                     int index = getAdapterPosition();
-//                    ((MainActivity)context).likeProcess(index);
+//                    ((FirstFragment)((MainActivity)context).firstFragment).likeProcess(index);
+                    listener.likeProcess(index);
+
                 }
             });
-
         }
     }
 

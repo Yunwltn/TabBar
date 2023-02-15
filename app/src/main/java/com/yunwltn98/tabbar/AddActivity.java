@@ -31,8 +31,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.yunwltn98.tabbar.adapter.api.NetworkClient;
-import com.yunwltn98.tabbar.adapter.api.PostingApi;
+import com.yunwltn98.tabbar.api.NetworkClient;
+import com.yunwltn98.tabbar.api.PostingApi;
 import com.yunwltn98.tabbar.config.Config;
 import com.yunwltn98.tabbar.model.Res;
 

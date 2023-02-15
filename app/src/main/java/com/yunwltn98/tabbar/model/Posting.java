@@ -2,36 +2,19 @@ package com.yunwltn98.tabbar.model;
 
 public class Posting {
 
-    private int followerId;
-    private String email;
-    private int postingId;
+    private int id;
     private String imgUrl;
     private String content;
-    private String createdAt;
+    private String email;
+    private String updatedAt;
     private int isLike;
 
-    public int getFollowerId() {
-        return followerId;
+    public int getId() {
+        return id;
     }
 
-    public void setFollowerId(int followerId) {
-        this.followerId = followerId;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
-    }
-
-    public int getPostingId() {
-        return postingId;
-    }
-
-    public void setPostingId(int postingId) {
-        this.postingId = postingId;
+    public void setId(int id) {
+        this.id = id;
     }
 
     public String getImgUrl() {
@@ -50,12 +33,20 @@ public class Posting {
         this.content = content;
     }
 
-    public String getCreatedAt() {
-        return createdAt;
+    public String getEmail() {
+        return email;
     }
 
-    public void setCreatedAt(String createdAt) {
-        this.createdAt = createdAt;
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(String updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
     public int getIsLike() {
